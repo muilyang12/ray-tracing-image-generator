@@ -1,13 +1,20 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, memo } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import throttle from "lodash.throttle";
+import { useCameraPositionStore } from "../stores/useCameraPositionStore";
 
 interface ObjViewerProps {
   file: File;
 }
 
 function ObjViewer({ file }: ObjViewerProps) {
+  const setPosition = useCameraPositionStore((state) => state.setPosition);
+  const throttledSetPosition = throttle((pos: THREE.Vector3) => {
+    setPosition(pos);
+  }, 100);
+
   const objViewerWrapperRef = useRef<HTMLDivElement>(null);
 
   const sceneRef = useRef<THREE.Scene>(null);
@@ -80,7 +87,6 @@ function ObjViewer({ file }: ObjViewerProps) {
     objViewerWrapperRef.current.appendChild(renderer.domElement);
 
     const orbitControls = new OrbitControls(camera, renderer.domElement);
-    orbitControls.enableDamping = true;
 
     const dirLightXPlus = new THREE.DirectionalLight(0xffffff, 1);
     const dirLightXMinus = new THREE.DirectionalLight(0xffffff, 1);
@@ -100,11 +106,14 @@ function ObjViewer({ file }: ObjViewerProps) {
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
-      orbitControlsRef.current.update();
+      orbitControlsRef.current?.update();
+
+      throttledSetPosition(cameraRef.current?.position);
     };
     animate();
 
     return () => {
+      throttledSetPosition.unmount();
       orbitControlsRef.current?.dispose();
       rendererRef.current?.dispose();
       objViewerWrapperRef.current?.removeChild(renderer.domElement);
@@ -120,4 +129,4 @@ function ObjViewer({ file }: ObjViewerProps) {
   return <div ref={objViewerWrapperRef} style={{ width: "500px", height: "500px" }} />;
 }
 
-export default ObjViewer;
+export default memo(ObjViewer);
