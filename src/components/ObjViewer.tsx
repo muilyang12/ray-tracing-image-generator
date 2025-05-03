@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 interface ObjViewerProps {
   file: File;
@@ -8,18 +9,22 @@ interface ObjViewerProps {
 
 function ObjViewer({ file }: ObjViewerProps) {
   const objViewerWrapperRef = useRef<HTMLDivElement>(null);
+
   const sceneRef = useRef<THREE.Scene>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
   const rendererRef = useRef<THREE.WebGLRenderer>(null);
   const lightsRef =
     useRef<Record<"dirLightXMinus" | "dirLightXPlus", THREE.DirectionalLight>>(null);
 
+  const orbitControlsRef = useRef<OrbitControls>(null);
+
   const loadObj = useCallback((file: File) => {
     if (!sceneRef.current) return;
 
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      if (!sceneRef.current || !cameraRef.current || !lightsRef.current) return;
+      if (!sceneRef.current || !cameraRef.current) return;
+      if (!lightsRef.current || !orbitControlsRef.current) return;
 
       const fileData = fileReader.result;
       if (typeof fileData !== "string") return;
@@ -53,6 +58,9 @@ function ObjViewer({ file }: ObjViewerProps) {
         .copy(boundingSphere.center)
         .add(new THREE.Vector3(-radius, 0, 0));
       lightsRef.current.dirLightXMinus.target.position.copy(boundingSphere.center);
+
+      orbitControlsRef.current.target.copy(boundingSphere.center);
+      orbitControlsRef.current.update();
     };
 
     fileReader.readAsText(file);
@@ -71,6 +79,9 @@ function ObjViewer({ file }: ObjViewerProps) {
     renderer.setSize(width, height);
     objViewerWrapperRef.current.appendChild(renderer.domElement);
 
+    const orbitControls = new OrbitControls(camera, renderer.domElement);
+    orbitControls.enableDamping = true;
+
     const dirLightXPlus = new THREE.DirectionalLight(0xffffff, 1);
     const dirLightXMinus = new THREE.DirectionalLight(0xffffff, 1);
 
@@ -84,15 +95,18 @@ function ObjViewer({ file }: ObjViewerProps) {
       dirLightXPlus,
       dirLightXMinus,
     };
+    orbitControlsRef.current = orbitControls;
 
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
+      orbitControlsRef.current.update();
     };
     animate();
 
     return () => {
-      renderer.dispose();
+      orbitControlsRef.current?.dispose();
+      rendererRef.current?.dispose();
       objViewerWrapperRef.current?.removeChild(renderer.domElement);
     };
   }, []);
