@@ -4,6 +4,7 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import throttle from "lodash.throttle";
 import { useCameraPositionStore } from "../stores/useCameraPositionStore";
+import { useModelCenterStore } from "../stores/useModelCenterStore";
 
 interface ObjViewerProps {
   file: File;
@@ -14,6 +15,7 @@ function ObjViewer({ file }: ObjViewerProps) {
   const throttledSetPosition = throttle((newPosition?: THREE.Vector3) => {
     setPosition(newPosition);
   }, 100);
+  const setCenter = useModelCenterStore((state) => state.setCenter);
 
   const objViewerWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +70,8 @@ function ObjViewer({ file }: ObjViewerProps) {
 
       orbitControlsRef.current.target.copy(boundingSphere.center);
       orbitControlsRef.current.update();
+
+      setCenter(boundingSphere.center);
     };
 
     fileReader.readAsText(file);
