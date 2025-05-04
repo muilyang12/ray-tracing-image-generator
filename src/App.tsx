@@ -58,7 +58,7 @@ function App() {
         width,
         height,
         data: _imageData,
-      } = rayTracingRef.current.rayTracing(position, modelCenter, boundingSphereRadius);
+      } = rayTracingRef.current.rayTracing(file.name, position, modelCenter, boundingSphereRadius);
       const imageData = new Uint8ClampedArray(_imageData);
 
       canvasRef.current.width = width;
