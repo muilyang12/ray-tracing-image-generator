@@ -3,6 +3,7 @@ import ObjViewer from "./components/ObjViewer";
 import { useCameraPositionStore } from "./stores/useCameraPositionStore";
 import { useModelDataStore } from "./stores/useModelDataStore.js";
 import RayTracingFactory from "./wasm/ray-tracing.js";
+import defaultModelUrl from "./assets/bunny.obj?url";
 
 import "./App.css";
 
@@ -33,7 +34,7 @@ function App() {
   };
 
   const handleClickUseDefaultButton = async () => {
-    const response = await fetch("/bunny.obj");
+    const response = await fetch(defaultModelUrl);
     const blob = await response.blob();
     const objFile = new File([blob], "bunny.obj", { type: blob.type });
 
