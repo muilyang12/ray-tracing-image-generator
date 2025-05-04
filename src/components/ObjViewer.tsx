@@ -8,9 +8,11 @@ import { useModelDataStore } from "../stores/useModelDataStore";
 
 interface ObjViewerProps {
   file: File;
+  width: number;
+  height: number;
 }
 
-function ObjViewer({ file }: ObjViewerProps) {
+function ObjViewer({ file, width, height }: ObjViewerProps) {
   const setPosition = useCameraPositionStore((state) => state.setPosition);
   const throttledSetPosition = throttle((newPosition?: THREE.Vector3) => {
     setPosition(newPosition);
@@ -132,7 +134,7 @@ function ObjViewer({ file }: ObjViewerProps) {
     loadObj(file);
   }, [file]);
 
-  return <div ref={objViewerWrapperRef} style={{ width: "500px", height: "500px" }} />;
+  return <div ref={objViewerWrapperRef} style={{ width: `${width}px`, height: `${height}px` }} />;
 }
 
 export default memo(ObjViewer);

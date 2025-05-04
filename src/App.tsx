@@ -6,6 +6,9 @@ import RayTracingFactory from "./wasm/ray-tracing.js";
 
 import "./App.css";
 
+const WIDTH = 500;
+const HEIGHT = 500;
+
 function App() {
   const position = useCameraPositionStore((state) => state.position);
   const modelCenter = useModelDataStore((state) => state.modelCenter);
@@ -58,7 +61,14 @@ function App() {
         width,
         height,
         data: _imageData,
-      } = rayTracingRef.current.rayTracing(file.name, position, modelCenter, boundingSphereRadius);
+      } = rayTracingRef.current.rayTracing(
+        file.name,
+        WIDTH,
+        HEIGHT,
+        position,
+        modelCenter,
+        boundingSphereRadius
+      );
       const imageData = new Uint8ClampedArray(_imageData);
 
       canvasRef.current.width = width;
@@ -79,7 +89,7 @@ function App() {
       <input type="file" id="obj-uploader" accept=".obj" onChange={handleFileChange} />
       {file && (
         <>
-          <ObjViewer file={file} />
+          <ObjViewer file={file} width={WIDTH} height={HEIGHT} />
 
           <div>
             <button onClick={handleClickGenerate} disabled={!isWasmReady}>
