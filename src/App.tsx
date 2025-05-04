@@ -1,14 +1,15 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import ObjViewer from "./components/ObjViewer";
 import { useCameraPositionStore } from "./stores/useCameraPositionStore";
-import { useModelCenterStore } from "./stores/useModelCenterStore.js";
+import { useModelDataStore } from "./stores/useModelDataStore.js";
 import RayTracingFactory from "./wasm/ray-tracing.js";
 
 import "./App.css";
 
 function App() {
   const position = useCameraPositionStore((state) => state.position);
-  const center = useModelCenterStore((state) => state.center);
+  const modelCenter = useModelDataStore((state) => state.modelCenter);
+  const boundingSphereRadius = useModelDataStore((state) => state.boundingSphereRadius);
 
   const [file, setFile] = useState<File>();
 
@@ -40,7 +41,7 @@ function App() {
 
   const handleClickGenerate = () => {
     if (!file || !rayTracingRef.current || !canvasRef.current) return;
-    if (!position || !center) return;
+    if (!position || !modelCenter) return;
 
     const wasmFileSystem = rayTracingRef.current.FS;
 
@@ -57,14 +58,7 @@ function App() {
         width,
         height,
         data: _imageData,
-      } = rayTracingRef.current.rayTracing(
-        {
-          x: position.x,
-          y: position.y,
-          z: position.z,
-        },
-        { x: center.x, y: center.y, z: center.z }
-      );
+      } = rayTracingRef.current.rayTracing(position, modelCenter, boundingSphereRadius);
       const imageData = new Uint8ClampedArray(_imageData);
 
       canvasRef.current.width = width;
