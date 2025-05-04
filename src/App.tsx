@@ -32,6 +32,14 @@ function App() {
     setFile(newFile);
   };
 
+  const handleClickUseDefaultButton = async () => {
+    const response = await fetch("/bunny.obj");
+    const blob = await response.blob();
+    const objFile = new File([blob], "bunny.obj", { type: blob.type });
+
+    setFile(objFile);
+  };
+
   useEffect(() => {
     const loadWasm = async () => {
       const rayTracing = await RayTracingFactory();
@@ -86,7 +94,16 @@ function App() {
 
   return (
     <>
-      <input type="file" id="obj-uploader" accept=".obj" onChange={handleFileChange} />
+      <div>
+        {"Upload .obj file: "}
+        <input type="file" id="obj-uploader" accept=".obj" onChange={handleFileChange} />
+      </div>
+      <br />
+      <div>
+        {"Try with a default model: "}
+        <button onClick={handleClickUseDefaultButton}>Use</button>
+      </div>
+
       {file && (
         <>
           <ObjViewer file={file} width={WIDTH} height={HEIGHT} />
