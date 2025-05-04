@@ -31,9 +31,6 @@ function App() {
   useEffect(() => {
     const loadWasm = async () => {
       const rayTracing = await RayTracingFactory();
-      console.log(rayTracing.add(2, 3));
-      console.log(rayTracing.square(3));
-
       rayTracingRef.current = rayTracing;
       setIsWasmReady(true);
     };
