@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ObjViewer from "./components/ObjViewer";
 import { useCameraPositionStore } from "./stores/useCameraPositionStore";
 import { useModelDataStore } from "./stores/useModelDataStore.js";
@@ -22,15 +22,30 @@ function App() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length == 0) {
-      setFile(undefined);
+  const handleClickUploadButton = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".obj";
 
-      return;
-    }
+    input.addEventListener("change", (e: Event) => {
+      const target = e.target as HTMLInputElement;
 
-    const newFile = e.target.files[0];
-    setFile(newFile);
+      if (!target.files || target.files.length == 0) {
+        setFile(undefined);
+
+        return;
+      }
+
+      const newFile = target.files[0];
+      setFile(newFile);
+
+      document.body.removeChild(input);
+    });
+
+    input.style.display = "none";
+    document.body.appendChild(input);
+
+    input.click();
   };
 
   const handleClickUseDefaultButton = async () => {
@@ -97,12 +112,12 @@ function App() {
     <>
       <div>
         {"Upload .obj file: "}
-        <input type="file" id="obj-uploader" accept=".obj" onChange={handleFileChange} />
+        <button onClick={handleClickUploadButton}>Upload</button>
       </div>
       <br />
       <div>
         {"Try with a default model: "}
-        <button onClick={handleClickUseDefaultButton}>Use</button>
+        <button onClick={handleClickUseDefaultButton}>Try</button>
       </div>
 
       {file && (
