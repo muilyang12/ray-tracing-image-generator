@@ -22,6 +22,17 @@ function App() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [isGuidanceShowing, setIsGuidanceShowing] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsGuidanceShowing(false);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }, 3000);
+  }, []);
+
   const handleClickUploadButton = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -122,16 +133,16 @@ function App() {
 
       {file && (
         <>
-          <ObjViewer file={file} width={WIDTH} height={HEIGHT} />
-
+          <div style={{ position: "relative" }}>
+            <ObjViewer file={file} width={WIDTH} height={HEIGHT} />
+            <div className={isGuidanceShowing ? "visible" : "invisible"}>Drag to rotate</div>
+          </div>
           <div>
             <button onClick={handleClickGenerate} disabled={!isWasmReady}>
               Generate
             </button>
           </div>
-
           <br />
-
           <canvas ref={canvasRef} />
         </>
       )}
