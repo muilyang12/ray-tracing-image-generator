@@ -33,7 +33,7 @@ Follow the steps below to build and run the project locally.
 ### Step 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/ray-tracing-image-generator.git
+git clone https://github.com/muilyang12/ray-tracing-image-generator.git
 cd ray-tracing-image-generator
 ```
 
@@ -42,9 +42,9 @@ cd ray-tracing-image-generator
 ```bash
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install latest
-./emsdk activate latest
-source ./emsdk_env.bat
+emsdk install latest
+emsdk activate latest
+emsdk_env.bat
 ```
 
 ### Step 3. Build WASM Module
