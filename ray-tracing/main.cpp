@@ -30,8 +30,8 @@ emscripten::val rayTracing(emscripten::val fileNameJs, emscripten::val widthJs, 
     modelMesh.loadFile(fileName);
 
     scene.addObject(&modelMesh);
-    scene.addLight(std::make_unique<Light>(Vector3f(-20, 70, 20), 1));
-    scene.addLight(std::make_unique<Light>(Vector3f(20, 70, 20), 1));
+    scene.addLight(std::make_unique<Light>(modelCenter + 2 * Vector3f(boundingSphereRadius, boundingSphereRadius, boundingSphereRadius), 2));
+    scene.addLight(std::make_unique<Light>(modelCenter - 2 * Vector3f(boundingSphereRadius, boundingSphereRadius, boundingSphereRadius), 2));
 
     scene.buildBVH();
 
