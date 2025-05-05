@@ -4,11 +4,17 @@
 
 This project is a WebAssembly-powered ray tracing image generator built using C++ and integrated into a React + Three.js frontend. You can upload `.obj` files or use a default model to generate ray-traced images directly in the browser.
 
+**🔗 Live Demo:** [https://muilyang12.github.io/ray-tracing-image-generator/](https://muilyang12.github.io/ray-tracing-image-generator/)
+
+<br />
+
 ## Demo Video
 
 <div align="center">
     <img src="./demo.gif" alt="Demo video of Ray Tracing" width="800" />
 </div>
+
+<br />
 
 ## Technologies Used
 
@@ -17,6 +23,8 @@ This project is a WebAssembly-powered ray tracing image generator built using C+
 - React
 - Three.js (for UI interaction)
 - Zustand (for state management)
+
+<br />
 
 ## Setup Guide
 
