@@ -36,18 +36,19 @@ git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install latest
 ./emsdk activate latest
-source ./emsdk_env.sh
+source ./emsdk_env.bat
 ```
 
 ### Step 3. Build WASM Module
 
 ```bash
-emcc ../ray-tracing/main.cpp ../ray-tracing/Renderer.cpp ../ray-tracing/Scene.cpp ../ray-tracing/Vector.cpp ../ray-tracing/BVH.cpp -O3 -s EXPORTED_RUNTIME_METHODS=['FS'] -s WASM=1 -s MODULARIZE=1 -s EXPORT_ES6=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_NAME="RayTracingFactory" --bind -o ../src/wasm/ray-tracing.js
+emcc ../ray-tracing/main.cpp ../ray-tracing/BVHTree.cpp ../ray-tracing/Scene.cpp ../ray-tracing/RayTracer.cpp ../ray-tracing/Renderer.cpp -O3 -s EXPORTED_RUNTIME_METHODS=['FS'] -s WASM=1 -s MODULARIZE=1 -s EXPORT_ES6=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_NAME="RayTracingFactory" --bind -o ../src/wasm/ray-tracing.js
 ```
 
 ### Step 4. Run the Development Server
 
 ```bash
+cd ../
 npm install
 npm run dev
 ```
