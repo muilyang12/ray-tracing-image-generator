@@ -97,52 +97,65 @@ public:
   void loadFile(const std::string &filename)
   {
     ObjLoader::Loader loader;
-    loader.LoadFile(filename);
-
-    assert(loader.LoadedMeshes.size() == 1);
-
-    auto mesh = loader.LoadedMeshes[0];
-
-    std::cout << "Number of vertices: " << mesh.Vertices.size() << std::endl;
-
-    Vector3f min_vert = Vector3f{std::numeric_limits<float>::infinity(),
-                                 std::numeric_limits<float>::infinity(),
-                                 std::numeric_limits<float>::infinity()};
-    Vector3f max_vert = Vector3f{-std::numeric_limits<float>::infinity(),
-                                 -std::numeric_limits<float>::infinity(),
-                                 -std::numeric_limits<float>::infinity()};
-
-    for (int i = 0; i < mesh.Vertices.size(); i += 3)
+    if (!loader.LoadFile(filename))
     {
-      std::array<Vector3f, 3> face_vertices;
-      for (int j = 0; j < 3; j++)
-      {
-        auto vert = Vector3f(mesh.Vertices[i + j].Position.X,
-                             mesh.Vertices[i + j].Position.Y,
-                             mesh.Vertices[i + j].Position.Z);
-        face_vertices[j] = vert;
-
-        min_vert =
-            Vector3f(std::min(min_vert.x, vert.x), std::min(min_vert.y, vert.y),
-                     std::min(min_vert.z, vert.z));
-        max_vert =
-            Vector3f(std::max(max_vert.x, vert.x), std::max(max_vert.y, vert.y),
-                     std::max(max_vert.z, vert.z));
-      }
-
-      auto new_mat = new Material(MaterialType::DIFFUSE_AND_GLOSSY,
-                                  Vector3f(0.5, 0.5, 0.5), Vector3f(0, 0, 0));
-      new_mat->Kd = 0.6;
-      new_mat->Ks = 0.0;
-      new_mat->specularExponent = 0;
-
-      triangles.emplace_back(face_vertices[0], face_vertices[1],
-                             face_vertices[2], new_mat);
+      throw std::runtime_error("OBJ load failed: " + filename);
     }
+
+    Vector3f min_vert{std::numeric_limits<float>::infinity(),
+                      std::numeric_limits<float>::infinity(),
+                      std::numeric_limits<float>::infinity()};
+    Vector3f max_vert{-std::numeric_limits<float>::infinity(),
+                      -std::numeric_limits<float>::infinity(),
+                      -std::numeric_limits<float>::infinity()};
+
+    triangles.clear();
+
+    for (const auto &mesh : loader.LoadedMeshes)
+    {
+      for (size_t f = 0; f < mesh.Indices.size(); f += 3)
+      {
+        uint32_t idx0 = mesh.Indices[f];
+        uint32_t idx1 = mesh.Indices[f + 1];
+        uint32_t idx2 = mesh.Indices[f + 2];
+
+        auto toV3 = [&](uint32_t i)
+        {
+          const auto &v = mesh.Vertices[i].Position;
+          return Vector3f(v.X, v.Y, v.Z);
+        };
+
+        Vector3f v0 = toV3(idx0);
+        Vector3f v1 = toV3(idx1);
+        Vector3f v2 = toV3(idx2);
+
+        auto updateBounds = [&](const Vector3f &p)
+        {
+          min_vert = Vector3f(std::min(min_vert.x, p.x),
+                              std::min(min_vert.y, p.y),
+                              std::min(min_vert.z, p.z));
+          max_vert = Vector3f(std::max(max_vert.x, p.x),
+                              std::max(max_vert.y, p.y),
+                              std::max(max_vert.z, p.z));
+        };
+        updateBounds(v0);
+        updateBounds(v1);
+        updateBounds(v2);
+
+        auto *new_mat = new Material(MaterialType::DIFFUSE_AND_GLOSSY,
+                                     Vector3f(0.6f), Vector3f(0));
+        new_mat->Kd = 0.6f;
+
+        triangles.emplace_back(v0, v1, v2, new_mat);
+      }
+    }
+
+    std::cout << "Total number of vertices: " << triangles.size() << std::endl;
 
     bounding_box = Bounds3(min_vert, max_vert);
 
     std::vector<Object *> ptrs;
+    ptrs.reserve(triangles.size());
     for (auto &tri : triangles)
       ptrs.push_back(&tri);
 
