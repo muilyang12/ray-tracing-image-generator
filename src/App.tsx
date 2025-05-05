@@ -139,7 +139,7 @@ function App() {
           </div>
           <div>
             <button onClick={handleClickGenerate} disabled={!isWasmReady}>
-              Generate
+              Generate Ray Tracing Image
             </button>
           </div>
           <br />
